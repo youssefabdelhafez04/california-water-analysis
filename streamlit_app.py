@@ -50,6 +50,7 @@ def session_question_limit() -> int:
 
 data, geometry = load_dashboard_data()
 st.title("California irrigation use and precipitation")
+st.caption("Try the Chat with the data tab to ask questions in plain English.")
 st.caption(
     "Precomputed HUC4 summaries from USGS modeled irrigation/effective precipitation and NOAA stations. "
     "The dashboard never loads the raw wide source files."
@@ -89,19 +90,33 @@ with dashboard_tab:
         labels={metric: metric_label},
     )
     fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(margin={"r": 0, "t": 35, "l": 0, "b": 0}, height=600)
+    fig.update_layout(margin={"r": 0, "t": 35, "l": 0, "b": 0}, height=750)
     st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Selected watershed trends")
-    trend = data[data["watershed"].isin(selected)].copy()
+    top_irrigation_watersheds = (
+        data.groupby("watershed", as_index=False)["irrigation_mgd"]
+        .sum()
+        .nlargest(5, "irrigation_mgd")["watershed"]
+        .tolist()
+    )
+    trend_watersheds = st.multiselect(
+        "Trend watersheds",
+        watersheds,
+        default=top_irrigation_watersheds,
+    )
+    log_scale = st.checkbox("Log scale", value=False)
+    trend = data[data["watershed"].isin(trend_watersheds)].copy()
     trend_fig = px.line(
         trend,
         x="year",
         y=metric,
         color="watershed",
         markers=True,
+        color_discrete_sequence=px.colors.qualitative.Safe,
         labels={metric: metric_label, "year": "Year"},
     )
+    trend_fig.update_yaxes(type="log" if log_scale else "linear")
     st.plotly_chart(trend_fig, use_container_width=True)
 
     with st.expander("Data and interpretation notes"):
