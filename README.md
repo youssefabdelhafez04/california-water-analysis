@@ -4,6 +4,8 @@
 
 Python · SQLite · Streamlit · OpenAI tool calling · USGS · NOAA
 
+**Live dashboard:** [california-water-analysis.streamlit.app](https://california-water-analysis.streamlit.app/)
+
 ## Project snapshot
 
 - Builds a validated balanced panel of **1,169 HUC12 watersheds and 24,549 watershed-year observations** from USGS modeled water data.
