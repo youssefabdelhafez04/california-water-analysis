@@ -1,0 +1,18 @@
+{
+  "specification_sha256": "4e4a8b7cc108b623f415eab1829e35c6af785d4c3ddacea976935f2d478e7e37",
+  "primary_years": "2000-2020",
+  "primary_drought_cutoff": -1.0,
+  "validation_train_years": "2001-2013",
+  "validation_test_years": "2014-2020",
+  "ridge_alpha": 1.0,
+  "robustness_specifications": [
+    "primary_spi_le_minus_1",
+    "drought_spi_le_minus_0_8",
+    "drought_spi_le_minus_1_5",
+    "drought_bottom_20_percent",
+    "drop_top_1_percent_mean_irrigation",
+    "window_2000_2017",
+    "window_2005_2020",
+    "unbalanced_at_least_15_years"
+  ]
+}

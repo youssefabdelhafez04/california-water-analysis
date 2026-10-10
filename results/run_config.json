@@ -1,0 +1,9 @@
+{
+  "pre_start": 2014,
+  "pre_end": 2017,
+  "post_start": 2018,
+  "post_end": 2020,
+  "rainfall_fit_years": "2000-2017",
+  "bootstrap_resamples": 20000,
+  "random_seed": 2026
+}

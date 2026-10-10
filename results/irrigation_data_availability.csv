@@ -1,0 +1,2 @@
+geography_available,huc12_columns_in_nine_huc4_regions,years,total_unit_year_rows,paired_nonmissing_rows,paired_positive_rows,balanced_positive_huc12_units,huc12_units_with_at_least_15_positive_years,temperature_geography
+HUC12,4335,2000-2020,91035,32924,27985,1169,1282,HUC4 (3 NOAA stations where coverage permits)

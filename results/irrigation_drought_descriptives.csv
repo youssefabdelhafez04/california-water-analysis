@@ -1,0 +1,3 @@
+drought,observations,mean_irrigation_mgd,median_irrigation_mgd,mean_within_unit_irrigation_index,mean_effective_precipitation_mgd,mean_spi_proxy,drought_definition
+False,20620,13.139847092525144,2.878183458746538,1.0156680964065787,2.6771150654511677,0.28775749681264634,SPI proxy <= -1
+True,3929,16.3181847452908,3.880478091232877,0.9177714054712012,1.8515711758873938,-1.5197631524112443,SPI proxy <= -1

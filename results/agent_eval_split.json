@@ -1,0 +1,60 @@
+{
+  "seed": 20261009,
+  "method": "Within each question type, deterministic seeded shuffle; five dev and five held out.",
+  "dev_ids": [
+    "agg_02",
+    "agg_05",
+    "agg_06",
+    "agg_07",
+    "agg_10",
+    "compare_01",
+    "compare_02",
+    "compare_04",
+    "compare_05",
+    "compare_10",
+    "join_01",
+    "join_02",
+    "join_04",
+    "join_06",
+    "join_10",
+    "lookup_03",
+    "lookup_05",
+    "lookup_06",
+    "lookup_07",
+    "lookup_10"
+  ],
+  "heldout_ids": [
+    "agg_01",
+    "agg_03",
+    "agg_04",
+    "agg_08",
+    "agg_09",
+    "compare_03",
+    "compare_06",
+    "compare_07",
+    "compare_08",
+    "compare_09",
+    "join_03",
+    "join_05",
+    "join_07",
+    "join_08",
+    "join_09",
+    "lookup_01",
+    "lookup_02",
+    "lookup_04",
+    "lookup_08",
+    "lookup_09"
+  ],
+  "dev_type_counts": {
+    "aggregation": 5,
+    "year_comparison": 5,
+    "multi_table_join": 5,
+    "simple_lookup": 5
+  },
+  "heldout_type_counts": {
+    "aggregation": 5,
+    "year_comparison": 5,
+    "multi_table_join": 5,
+    "simple_lookup": 5
+  }
+}

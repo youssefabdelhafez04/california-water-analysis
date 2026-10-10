@@ -1,0 +1,3 @@
+model,train_window,test_window,rmse_mgd,mae_mgd,test_observations
+weather_lag_ridge,2000-2013,2014-2017,168.13474881732526,114.29310614905343,36
+naive_last_year,2000-2013,2014-2017,168.34885446320484,104.48755635180102,36

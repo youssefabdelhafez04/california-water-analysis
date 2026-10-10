@@ -1,0 +1,10 @@
+{
+  "name": "schema_guide",
+  "model": "gpt-5-mini",
+  "use_schema_guide": true,
+  "use_examples": false,
+  "inspect_values_first": false,
+  "service_tier": "default",
+  "min_request_interval_seconds": 2.0,
+  "max_rate_limit_retries": 8
+}

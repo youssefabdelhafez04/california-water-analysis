@@ -1,0 +1,287 @@
+id,type,question,expected_sql,expected_result,agent_answer,agent_sql,agent_result,correct,failure_type,error,attempts,model
+lookup_01,simple_lookup,Which watershed used the most irrigation water in 2015? Return the watershed and irrigation MGD.,"SELECT watershed, irrigation_mgd FROM dashboard_huc4_year WHERE year = 2015 ORDER BY irrigation_mgd DESC LIMIT 1","[[""Tulare-Buena Vista"", 5721.59704145247]]",Tulare-Buena Vista — 5721.59704145247 MGD.,"SELECT watershed, irrigation_mgd FROM dashboard_huc4_year WHERE year = 2015 ORDER BY irrigation_mgd DESC LIMIT 1;","[[""Tulare-Buena Vista"", 5721.59704145247]]",true,,,1,gpt-5-mini
+lookup_02,simple_lookup,What was Sacramento watershed's precipitation in 2010?,SELECT precipitation_in FROM dashboard_huc4_year WHERE watershed = 'Sacramento' AND year = 2010,[[36.10545977011494]],The Sacramento watershed's precipitation in 2010 was 36.10545977011494 inches.,SELECT precipitation_in FROM dashboard_huc4_year WHERE watershed = 'Sacramento' AND year = 2010;,[[36.10545977011494]],true,,,1,gpt-5-mini
+lookup_03,simple_lookup,What was the temperature in San Francisco Bay watershed in 2020?,SELECT temperature_f FROM dashboard_huc4_year WHERE watershed = 'San Francisco Bay' AND year = 2020,[[59.236942128989035]],The 2020 temperature for the San Francisco Bay watershed (HUC4 1805) was 59.236942128989035 °F.,"SELECT huc4, temperature_f FROM dashboard_huc4_year WHERE watershed = 'San Francisco Bay' AND year = 2020;","[[""1805"", 59.236942128989035]]",false,other_result_mismatch,,1,gpt-5-mini
+lookup_04,simple_lookup,How many HUC12 units were included for Northern Coastal in 2005?,SELECT huc12_count FROM dashboard_huc4_year WHERE watershed = 'Northern Coastal' AND year = 2005,[[218]],There were 218 HUC12 units included for Northern Coastal in 2005.,SELECT huc12_count FROM dashboard_huc4_year WHERE watershed = 'Northern Coastal' AND year = 2005;,[[218]],true,,,1,gpt-5-mini
+lookup_05,simple_lookup,"What was effective precipitation in Southern Coastal in 2012, in MGD equivalent?",SELECT effective_precipitation_mgd FROM dashboard_huc4_year WHERE watershed = 'Southern Coastal' AND year = 2012,[[18.440470846232]],Effective precipitation in Southern Coastal in 2012 was 18.440470846232 MGD.,"SELECT SUM(effective_precipitation_mgd) AS effective_precipitation_mgd
+FROM dashboard_huc4_year
+WHERE watershed = 'Southern Coastal' AND year = 2012;",[[18.440470846232]],true,,,1,gpt-5-mini
+lookup_06,simple_lookup,What was annual average public-supply use in San Joaquin in 2018?,SELECT annual_avg_use_mgd FROM water_huc4_annual_category WHERE watershed = 'San Joaquin' AND category = 'public_supply' AND year = 2018,[[335.0676893126917]],The annual average public-supply use in San Joaquin in 2018 was 335.0676893126917 MGD (million gallons per day).,"SELECT annual_avg_use_mgd, huc4, category FROM water_huc4_annual_category WHERE watershed = 'San Joaquin' AND year = 2018 AND lower(category) LIKE '%public%';","[[335.0676893126917, ""1804"", ""public_supply""]]",false,wrong_filter,,1,gpt-5-mini
+lookup_07,simple_lookup,What was annual average irrigation use in Central Coastal in 2003?,SELECT annual_avg_use_mgd FROM water_huc4_annual_category WHERE watershed = 'Central Coastal' AND category = 'irrigation' AND year = 2003,[[481.140522565551]],The annual average irrigation use in Central Coastal in 2003 was 481.140522565551 million gallons per day (mgd).,SELECT * FROM water_huc4_annual_category WHERE watershed = 'Central Coastal' AND year = 2003;,"[[""Central Coastal"", ""1806"", 2003, ""irrigation"", 481.140522565551, 20.917961432506885, 58.38428871574797, 3, 3], [""Central Coastal"", ""1806"", 2003, ""public_supply"", 170.51333063128334, 20.917961432506885, 58.38428871574797, 3, 3]]",false,wrong_filter,,1,gpt-5-mini
+lookup_08,simple_lookup,Which watershed has HUC4 code 1809?,SELECT DISTINCT watershed FROM dashboard_huc4_year WHERE huc4 = '1809',"[[""Northern Mojave""]]",HUC4 code 1809 corresponds to the Northern Mojave watershed.,SELECT DISTINCT watershed FROM dashboard_huc4_year WHERE huc4 = '1809';,"[[""Northern Mojave""]]",true,,,1,gpt-5-mini
+lookup_09,simple_lookup,Which watershed had the lowest precipitation in 2014? Return the watershed and inches.,"SELECT watershed, precipitation_in FROM dashboard_huc4_year WHERE year = 2014 ORDER BY precipitation_in ASC LIMIT 1","[[""Northern Mojave"", 2.3766666666666665]]",Northern Mojave — 2.3766666666666665 inches.,"SELECT watershed, precipitation_in FROM dashboard_huc4_year WHERE year = 2014 ORDER BY precipitation_in ASC LIMIT 1;","[[""Northern Mojave"", 2.3766666666666665]]",true,,,1,gpt-5-mini
+lookup_10,simple_lookup,What is the calendar-aligned correct-irrigation Pearson correlation in the correlation audit?,SELECT pearson_correlation FROM correlation_audit WHERE analysis = 'calendar_aligned_correct_irrigation',[[-0.6720699747556189]],The calendar-aligned correct-irrigation Pearson correlation is -0.6720699747556189.,"SELECT analysis, pearson_correlation FROM correlation_audit WHERE analysis LIKE '%calendar%';","[[""calendar_aligned_correct_irrigation"", -0.6720699747556189]]",false,wrong_filter,,1,gpt-5-mini
+agg_01,aggregation,What was Sacramento's average irrigation MGD across all available years?,SELECT AVG(irrigation_mgd) FROM dashboard_huc4_year WHERE watershed = 'Sacramento',[[3628.7542899369846]],Sacramento's average irrigation was 3628.7542899369846 MGD across all available years.,SELECT AVG(irrigation_mgd) AS average_irrigation_mgd FROM dashboard_huc4_year WHERE watershed = 'Sacramento';,[[3628.7542899369846]],true,,,1,gpt-5-mini
+agg_02,aggregation,What was the total irrigation MGD across all nine watersheds in 2015?,SELECT SUM(irrigation_mgd) FROM dashboard_huc4_year WHERE year = 2015,[[16985.917400900922]],The total irrigation was 16985.917400900922 MGD across the nine watersheds in 2015.,"SELECT SUM(irrigation_mgd) AS total_irrigation_mgd, COUNT(DISTINCT watershed) AS watershed_count FROM dashboard_huc4_year WHERE year=2015;","[[16985.917400900922, 9]]",false,wrong_aggregation,,1,gpt-5-mini
+agg_03,aggregation,What was each watershed's average precipitation over 2000 through 2020? List alphabetically.,"SELECT watershed, AVG(precipitation_in) FROM dashboard_huc4_year GROUP BY watershed ORDER BY watershed","[[""Central Coastal"", 23.29271968071963], [""Northern Coastal"", 40.49967076697986], [""Northern Mojave"", 4.041180952679219], [""Sacramento"", 32.856205692879335], [""San Francisco Bay"", 21.829578084005057], [""San Joaquin"", 28.58583757823626], [""Southern Coastal"", 10.06804700721735], [""Southern Mojave"", 4.289232708891256], [""Tulare-Buena Vista"", 9.14647224597337]]","Average precipitation (inches) for each watershed (2000–2020):
+
+- Central Coastal: 23.29271968071963 in  
+- Northern Coastal: 40.49967076697986 in  
+- Northern Mojave: 4.041180952679219 in  
+- Sacramento: 32.856205692879335 in  
+- San Francisco Bay: 21.829578084005057 in  
+- San Joaquin: 28.58583757823626 in  
+- Southern Coastal: 10.06804700721735 in  
+- Southern Mojave: 4.289232708891256 in  
+- Tulare-Buena Vista: 9.14647224597337 in","SELECT watershed, AVG(precipitation_in) AS average_precipitation_in
+FROM dashboard_huc4_year
+WHERE year BETWEEN 2000 AND 2020
+GROUP BY watershed
+ORDER BY watershed ASC;","[[""Central Coastal"", 23.29271968071963], [""Northern Coastal"", 40.49967076697986], [""Northern Mojave"", 4.041180952679219], [""Sacramento"", 32.856205692879335], [""San Francisco Bay"", 21.829578084005057], [""San Joaquin"", 28.58583757823626], [""Southern Coastal"", 10.06804700721735], [""Southern Mojave"", 4.289232708891256], [""Tulare-Buena Vista"", 9.14647224597337]]",true,,,1,gpt-5-mini
+agg_04,aggregation,What watershed-year observation had the highest temperature in the dashboard data?,"SELECT watershed, year, temperature_f FROM dashboard_huc4_year ORDER BY temperature_f DESC LIMIT 1","[[""Southern Mojave"", 2020, 76.32608695652173]]",The highest temperature observation is the Southern Mojave watershed in 2020 with temperature 76.32608695652173 °F.,"SELECT watershed, year, temperature_f FROM dashboard_huc4_year ORDER BY temperature_f DESC LIMIT 1;","[[""Southern Mojave"", 2020, 76.32608695652173]]",true,,,1,gpt-5-mini
+agg_05,aggregation,How many distinct HUC12 units ever have positive irrigation use?,SELECT COUNT(DISTINCT huc12) FROM irrigation_huc12_annual WHERE irrigation_mgd > 0,[[1637]],1637 distinct HUC12 units have ever had positive irrigation use.,"SELECT COUNT(DISTINCT huc12) AS distinct_huc12_positive_irrigation
+FROM irrigation_huc12_annual
+WHERE irrigation_mgd > 0;",[[1637]],true,,,1,gpt-5-mini
+agg_06,aggregation,What is mean public-supply use for each watershed across all years? List from highest to lowest.,"SELECT watershed, AVG(annual_avg_use_mgd) FROM water_huc4_annual_category WHERE category = 'public_supply' GROUP BY watershed ORDER BY AVG(annual_avg_use_mgd) DESC","[[""Southern Coastal"", 1895.1199944803316], [""San Francisco Bay"", 723.7914124892329], [""Sacramento"", 438.57386863040716], [""Tulare-Buena Vista"", 385.4446586697627], [""San Joaquin"", 320.09044608388166], [""Southern Mojave"", 166.2823261748155], [""Central Coastal"", 165.27611752844285], [""Northern Mojave"", 132.46980868171428], [""Northern Coastal"", 66.90812700873015]]","I queried the database for rows with category = 'public-supply' and got no results, so I cannot compute mean public‑supply use by watershed from the available data. If you want, I can retry looking for alternate category labels (for example ""Public supply"" or ""public supply"") and compute the means. Which should I try?","SELECT watershed, AVG(annual_avg_use_mgd) AS mean_public_supply_use FROM water_huc4_annual_category WHERE category = 'public-supply' GROUP BY watershed ORDER BY mean_public_supply_use DESC;",[],false,wrong_filter,,1,gpt-5-mini
+agg_07,aggregation,What is the sum of effective precipitation MGD for Southern Mojave from 2010 through 2020 inclusive?,SELECT SUM(effective_precipitation_mgd) FROM dashboard_huc4_year WHERE watershed = 'Southern Mojave' AND year BETWEEN 2010 AND 2020,[[779.2481001688149]],The sum of effective precipitation (MGD) for Southern Mojave from 2010 through 2020 is 779.2481001688149 MGD.,"SELECT SUM(effective_precipitation_mgd) AS sum_effective_precip_mgd
+FROM dashboard_huc4_year
+WHERE watershed = 'Southern Mojave'
+  AND year BETWEEN 2010 AND 2020;",[[779.2481001688149]],true,,,1,gpt-5-mini
+agg_08,aggregation,"For 2018, what was the average annual water use across watersheds for irrigation and public supply?","SELECT category, AVG(annual_avg_use_mgd) FROM water_huc4_annual_category WHERE year = 2018 GROUP BY category ORDER BY category","[[""irrigation"", 1933.1010812695686], [""public_supply"", 496.60496546959047]]","I queried the database for 2018 records with categories 'Irrigation' and 'Public supply' and it returned no matching rows, so I cannot compute those averages from the data as requested. 
+
+Would you like me to (a) list the category values present for 2018, or (b) try alternative category names? If so, I will run the appropriate query.","SELECT category, AVG(annual_avg_use_mgd) AS avg_annual_use_mgd
+FROM water_huc4_annual_category
+WHERE year = 2018 AND category IN ('Irrigation', 'Public supply')
+GROUP BY category;",[],false,other_result_mismatch,,1,gpt-5-mini
+agg_09,aggregation,How many watershed-year observations had more than 30 inches of precipitation?,SELECT COUNT(*) FROM dashboard_huc4_year WHERE precipitation_in > 30,[[46]],46 watershed-year observations had more than 30 inches of precipitation.,SELECT COUNT(*) AS count FROM dashboard_huc4_year WHERE precipitation_in > 30;,[[46]],true,,,1,gpt-5-mini
+agg_10,aggregation,Which three watersheds had the highest average irrigation MGD across all years?,"SELECT watershed, AVG(irrigation_mgd) FROM dashboard_huc4_year GROUP BY watershed ORDER BY AVG(irrigation_mgd) DESC LIMIT 3","[[""Tulare-Buena Vista"", 5491.698170561782], [""San Joaquin"", 4323.876639540624], [""Sacramento"", 3628.7542899369846]]","The three watersheds with the highest average irrigation MGD across all years are:
+1. Tulare-Buena Vista — 5491.698170561782 MGD
+2. San Joaquin — 4323.876639540624 MGD
+3. Sacramento — 3628.7542899369846 MGD","SELECT watershed, AVG(irrigation_mgd) AS avg_irrigation_mgd
+FROM dashboard_huc4_year
+GROUP BY watershed
+ORDER BY avg_irrigation_mgd DESC
+LIMIT 3;","[[""Tulare-Buena Vista"", 5491.698170561782], [""San Joaquin"", 4323.876639540624], [""Sacramento"", 3628.7542899369846]]",true,,,1,gpt-5-mini
+compare_01,year_comparison,"For each watershed, how much did irrigation MGD change from 2000 to 2020? List alphabetically.","SELECT watershed, MAX(CASE WHEN year = 2020 THEN irrigation_mgd END) - MAX(CASE WHEN year = 2000 THEN irrigation_mgd END) AS change_mgd FROM dashboard_huc4_year WHERE year IN (2000, 2020) GROUP BY watershed ORDER BY watershed","[[""Central Coastal"", 89.66128768299814], [""Northern Coastal"", 75.1961135482656], [""Northern Mojave"", 42.3245995987459], [""Sacramento"", 1193.512406008197], [""San Francisco Bay"", 71.25945498415578], [""San Joaquin"", 1206.8054148402643], [""Southern Coastal"", 130.8748098793859], [""Southern Mojave"", -132.3828081524657], [""Tulare-Buena Vista"", 839.7151999873022]]","Central Coastal: increased by 89.66128768299814 MGD (from 461.5521643760062 in 2000 to 551.2134520590043 in 2020)
+Northern Coastal: increased by 75.1961135482656 MGD (from 495.53492552497966 in 2000 to 570.7310390732453 in 2020)
+Northern Mojave: increased by 42.3245995987459 MGD (from 33.259333737662296 in 2000 to 75.5839333364082 in 2020)
+Sacramento: increased by 1193.512406008197 MGD (from 3155.9921276925334 in 2000 to 4349.5045337007305 in 2020)
+San Francisco Bay: increased by 71.25945498415578 MGD (from 65.58613569466311 in 2000 to 136.8455906788189 in 2020)
+San Joaquin: increased by 1206.8054148402643 MGD (from 3852.442051648336 in 2000 to 5059.2474664886 in 2020)
+Southern Coastal: increased by 130.8748098793859 MGD (from 77.78594039348862 in 2000 to 208.6607502728745 in 2020)
+Southern Mojave: decreased by 132.3828081524657 MGD (from 1376.5714325245626 in 2000 to 1244.188624372097 in 2020)
+Tulare-Buena Vista: increased by 839.7151999873022 MGD (from 5013.087332555675 in 2000 to 5852.802532542977 in 2020)","SELECT watershed,
+  COALESCE(SUM(CASE WHEN year=2000 THEN irrigation_mgd END),0) AS irrig_2000,
+  COALESCE(SUM(CASE WHEN year=2020 THEN irrigation_mgd END),0) AS irrig_2020,
+  COALESCE(SUM(CASE WHEN year=2020 THEN irrigation_mgd END),0) - COALESCE(SUM(CASE WHEN year=2000 THEN irrigation_mgd END),0) AS change_mgd
+FROM irrigation_huc12_annual
+GROUP BY watershed
+ORDER BY watershed ASC;","[[""Central Coastal"", 461.5521643760062, 551.2134520590043, 89.66128768299814], [""Northern Coastal"", 495.53492552497966, 570.7310390732453, 75.1961135482656], [""Northern Mojave"", 33.259333737662296, 75.5839333364082, 42.3245995987459], [""Sacramento"", 3155.9921276925334, 4349.5045337007305, 1193.512406008197], [""San Francisco Bay"", 65.58613569466311, 136.8455906788189, 71.25945498415578], [""San Joaquin"", 3852.442051648336, 5059.2474664886, 1206.8054148402643], [""Southern Coastal"", 77.78594039348862, 208.6607502728745, 130.8748098793859], [""Southern Mojave"", 1376.5714325245626, 1244.188624372097, -132.3828081524657], [""Tulare-Buena Vista"", 5013.087332555675, 5852.802532542977, 839.7151999873022]]",false,wrong_table,,1,gpt-5-mini
+compare_02,year_comparison,"Which watershed had the largest increase in irrigation MGD between 2010 and 2015, and what was the increase?","SELECT watershed, MAX(CASE WHEN year = 2015 THEN irrigation_mgd END) - MAX(CASE WHEN year = 2010 THEN irrigation_mgd END) AS increase_mgd FROM dashboard_huc4_year WHERE year IN (2010, 2015) GROUP BY watershed ORDER BY increase_mgd DESC LIMIT 1","[[""San Joaquin"", 886.8292506859348]]",San Joaquin had the largest increase: 886.8292506859348 MGD (from 3737.647550420695 MGD in 2010 to 4624.47680110663 MGD in 2015).,"SELECT watershed,
+  SUM(CASE WHEN year=2015 THEN irrigation_mgd ELSE 0 END) AS irrigation_2015_mgd,
+  SUM(CASE WHEN year=2010 THEN irrigation_mgd ELSE 0 END) AS irrigation_2010_mgd,
+  SUM(CASE WHEN year=2015 THEN irrigation_mgd ELSE 0 END) - SUM(CASE WHEN year=2010 THEN irrigation_mgd ELSE 0 END) AS increase_mgd
+FROM irrigation_huc12_annual
+GROUP BY watershed
+ORDER BY increase_mgd DESC
+LIMIT 1;","[[""San Joaquin"", 4624.47680110663, 3737.647550420695, 886.8292506859348]]",false,wrong_table,,1,gpt-5-mini
+compare_03,year_comparison,How much did Sacramento public-supply use change from 2017 to 2018?,"SELECT MAX(CASE WHEN year = 2018 THEN annual_avg_use_mgd END) - MAX(CASE WHEN year = 2017 THEN annual_avg_use_mgd END) AS change_mgd FROM water_huc4_annual_category WHERE watershed = 'Sacramento' AND category = 'public_supply' AND year IN (2017, 2018)",[[-4.457158683850082]],Sacramento public-supply use fell from 466.7888412520001 MGD in 2017 to 462.33168256815003 MGD in 2018 — a decrease of 4.45715868385007 MGD (≈ −0.95%).,"SELECT year, category, annual_avg_use_mgd FROM water_huc4_annual_category WHERE watershed = 'Sacramento' AND year IN (2017, 2018);","[[2017, ""irrigation"", 3373.02208771418], [2018, ""irrigation"", 3868.270106291837], [2017, ""public_supply"", 466.7888412520001], [2018, ""public_supply"", 462.33168256815003]]",false,wrong_aggregation,,1,gpt-5-mini
+compare_04,year_comparison,In which years after 2000 did San Joaquin irrigation MGD exceed its prior-year value?,"WITH values_by_year AS (SELECT year, irrigation_mgd, LAG(irrigation_mgd) OVER (ORDER BY year) AS prior FROM dashboard_huc4_year WHERE watershed = 'San Joaquin') SELECT year FROM values_by_year WHERE irrigation_mgd > prior ORDER BY year","[[2001], [2002], [2004], [2007], [2008], [2012], [2013], [2017], [2018], [2020]]","San Joaquin irrigation MGD exceeded its prior-year value in these years after 2000: 2002, 2004, 2007, 2008, 2012, 2013, 2017, 2018, and 2020.","SELECT year FROM (SELECT year, irrigation_mgd, LAG(irrigation_mgd) OVER (ORDER BY year) AS prev FROM dashboard_huc4_year WHERE watershed = 'San Joaquin' AND year > 2000) WHERE irrigation_mgd > prev ORDER BY year;","[[2002], [2004], [2007], [2008], [2012], [2013], [2017], [2018], [2020]]",false,wrong_table,,1,gpt-5-mini
+compare_05,year_comparison,"For each watershed, compare average irrigation MGD in 2000-2009 with 2011-2020 by returning later average minus earlier average.","SELECT watershed, AVG(CASE WHEN year BETWEEN 2011 AND 2020 THEN irrigation_mgd END) - AVG(CASE WHEN year BETWEEN 2000 AND 2009 THEN irrigation_mgd END) AS change_mgd FROM dashboard_huc4_year GROUP BY watershed ORDER BY watershed","[[""Central Coastal"", 63.26202849278809], [""Northern Coastal"", 41.45775322457837], [""Northern Mojave"", 8.627226662302839], [""Sacramento"", 240.73813905379302], [""San Francisco Bay"", 22.31765204939974], [""San Joaquin"", 341.9847239224473], [""Southern Coastal"", 41.75227361237941], [""Southern Mojave"", -55.13322915025037], [""Tulare-Buena Vista"", 358.8519135236147]]","Here are the 2011–2020 average minus 2000–2009 average irrigation (MGD) by watershed, with the two period averages:
+
+- Central Coastal: 2011–2020 = 555.322163670634, 2000–2009 = 492.06013517784595, difference = 63.26202849278809
+- Northern Coastal: 2011–2020 = 536.0981343702873, 2000–2009 = 494.64038114570894, difference = 41.45775322457837
+- Northern Mojave: 2011–2020 = 49.56963507756559, 2000–2009 = 40.942408415262754, difference = 8.627226662302839
+- Sacramento: 2011–2020 = 3764.9557174431743, 2000–2009 = 3524.2175783893813, difference = 240.73813905379302
+- San Francisco Bay: 2011–2020 = 99.4309379601583, 2000–2009 = 77.11328591075856, difference = 22.31765204939974
+- San Joaquin: 2011–2020 = 4524.180455957844, 2000–2009 = 4182.195732035397, difference = 341.9847239224473
+- Southern Coastal: 2011–2020 = 118.85921547310693, 2000–2009 = 77.10694186072752, difference = 41.75227361237941
+- Southern Mojave: 2011–2020 = 1255.0121358384622, 2000–2009 = 1310.1453649887126, difference = -55.13322915025037
+- Tulare-Buena Vista: 2011–2020 = 5696.896034721966, 2000–2009 = 5338.044121198352, difference = 358.8519135236147","SELECT watershed,
+       AVG(CASE WHEN year BETWEEN 2000 AND 2009 THEN irrigation_mgd END) AS avg_2000_2009,
+       AVG(CASE WHEN year BETWEEN 2011 AND 2020 THEN irrigation_mgd END) AS avg_2011_2020,
+       AVG(CASE WHEN year BETWEEN 2011 AND 2020 THEN irrigation_mgd END) - AVG(CASE WHEN year BETWEEN 2000 AND 2009 THEN irrigation_mgd END) AS diff_later_minus_earlier
+FROM dashboard_huc4_year
+GROUP BY watershed
+ORDER BY watershed;","[[""Central Coastal"", 492.06013517784595, 555.322163670634, 63.26202849278809], [""Northern Coastal"", 494.64038114570894, 536.0981343702873, 41.45775322457837], [""Northern Mojave"", 40.942408415262754, 49.56963507756559, 8.627226662302839], [""Sacramento"", 3524.2175783893813, 3764.9557174431743, 240.73813905379302], [""San Francisco Bay"", 77.11328591075856, 99.4309379601583, 22.31765204939974], [""San Joaquin"", 4182.195732035397, 4524.180455957844, 341.9847239224473], [""Southern Coastal"", 77.10694186072752, 118.85921547310693, 41.75227361237941], [""Southern Mojave"", 1310.1453649887126, 1255.0121358384622, -55.13322915025037], [""Tulare-Buena Vista"", 5338.044121198352, 5696.896034721966, 358.8519135236147]]",false,other_result_mismatch,,1,gpt-5-mini
+compare_06,year_comparison,What is the ratio of Tulare-Buena Vista irrigation MGD in 2015 to its irrigation MGD in 2010?,"SELECT MAX(CASE WHEN year = 2015 THEN irrigation_mgd END) / MAX(CASE WHEN year = 2010 THEN irrigation_mgd END) AS ratio FROM dashboard_huc4_year WHERE watershed = 'Tulare-Buena Vista' AND year IN (2010, 2015)",[[1.1497785516580927]],"Tulare‑Buena Vista irrigation was 4976.260022594237 MGD in 2010 and 5721.59704145247 MGD in 2015, so the 2015/2010 ratio is 1.1497785516580927.","SELECT (SELECT irrigation_mgd FROM dashboard_huc4_year WHERE watershed='Tulare-Buena Vista' AND year=2010) AS irrigation_2010_mgd, (SELECT irrigation_mgd FROM dashboard_huc4_year WHERE watershed='Tulare-Buena Vista' AND year=2015) AS irrigation_2015_mgd, ((SELECT irrigation_mgd FROM dashboard_huc4_year WHERE watershed='Tulare-Buena Vista' AND year=2015) / (SELECT irrigation_mgd FROM dashboard_huc4_year WHERE watershed='Tulare-Buena Vista' AND year=2010)) AS ratio;","[[4976.260022594237, 5721.59704145247, 1.1497785516580927]]",false,wrong_aggregation,,1,gpt-5-mini
+compare_07,year_comparison,"Which year had the highest irrigation MGD for Northern Mojave, and what was the value?","SELECT year, irrigation_mgd FROM dashboard_huc4_year WHERE watershed = 'Northern Mojave' ORDER BY irrigation_mgd DESC LIMIT 1","[[2020, 75.5839333364082]]","The highest irrigation for Northern Mojave occurred in 2020, with 75.5839333364082 MGD.","SELECT year, irrigation_mgd FROM dashboard_huc4_year WHERE watershed = 'Northern Mojave' ORDER BY irrigation_mgd DESC LIMIT 1;","[[2020, 75.5839333364082]]",true,,,1,gpt-5-mini
+compare_08,year_comparison,"Which year had the lowest effective precipitation for Sacramento, and what was the value?","SELECT year, effective_precipitation_mgd FROM dashboard_huc4_year WHERE watershed = 'Sacramento' ORDER BY effective_precipitation_mgd ASC LIMIT 1","[[2020, 680.63902613113]]",2020 had the lowest effective precipitation for Sacramento: 680.63902613113 (effective_precipitation_mgd).,"SELECT year, effective_precipitation_mgd
+FROM dashboard_huc4_year
+WHERE watershed = 'Sacramento'
+ORDER BY effective_precipitation_mgd ASC
+LIMIT 1;","[[2020, 680.63902613113]]",true,,,1,gpt-5-mini
+compare_09,year_comparison,"For every watershed in 2020, return public-supply use minus irrigation use, alphabetically.","SELECT watershed, MAX(CASE WHEN category = 'public_supply' THEN annual_avg_use_mgd END) - MAX(CASE WHEN category = 'irrigation' THEN annual_avg_use_mgd END) AS difference_mgd FROM water_huc4_annual_category WHERE year = 2020 GROUP BY watershed ORDER BY watershed","[[""Central Coastal"", -386.10463434975753], [""Northern Coastal"", -503.50846851698043], [""Northern Mojave"", 62.758415499684986], [""Sacramento"", -3854.608278505905], [""San Francisco Bay"", 754.2735704104015], [""San Joaquin"", -4706.769136290294], [""Southern Coastal"", 1722.37469609481], [""Southern Mojave"", -1069.5029366523977], [""Tulare-Buena Vista"", -5446.361921697436]]","Here are public-supply minus irrigation (mgd) for each watershed in 2020, alphabetically:
+
+- Central Coastal: -550.2588522130992 mgd
+- Northern Coastal: -568.6411522248471 mgd
+- Northern Mojave: -75.35493665512334 mgd
+- Sacramento: -4340.439343791389 mgd
+- San Francisco Bay: -136.69647963447343 mgd
+- San Joaquin: -5052.282383561994 mgd
+- Southern Coastal: -208.56120803998098 mgd
+- Southern Mojave: -1243.7356622081418 mgd
+- Tulare-Buena Vista: -5843.118597750377 mgd","SELECT w.watershed,
+       COALESCE(pub.annual_avg_use_mgd,0) - COALESCE(irr.annual_avg_use_mgd,0) AS public_minus_irrigation
+FROM (
+  SELECT DISTINCT watershed FROM water_huc4_annual_category WHERE year=2020
+) w
+LEFT JOIN (
+  SELECT watershed, annual_avg_use_mgd FROM water_huc4_annual_category WHERE year=2020 AND category='public-supply'
+) pub ON w.watershed = pub.watershed
+LEFT JOIN (
+  SELECT watershed, annual_avg_use_mgd FROM water_huc4_annual_category WHERE year=2020 AND category='irrigation'
+) irr ON w.watershed = irr.watershed
+ORDER BY w.watershed;","[[""Central Coastal"", -550.2588522130992], [""Northern Coastal"", -568.6411522248471], [""Northern Mojave"", -75.35493665512334], [""Sacramento"", -4340.439343791389], [""San Francisco Bay"", -136.69647963447343], [""San Joaquin"", -5052.282383561994], [""Southern Coastal"", -208.56120803998098], [""Southern Mojave"", -1243.7356622081418], [""Tulare-Buena Vista"", -5843.118597750377]]",false,wrong_aggregation,,1,gpt-5-mini
+compare_10,year_comparison,"For each watershed, how did precipitation change from 2012 to 2013? Return 2013 minus 2012 alphabetically.","SELECT watershed, MAX(CASE WHEN year = 2013 THEN precipitation_in END) - MAX(CASE WHEN year = 2012 THEN precipitation_in END) AS change_in FROM dashboard_huc4_year WHERE year IN (2012, 2013) GROUP BY watershed ORDER BY watershed","[[""Central Coastal"", -11.968148661126502], [""Northern Coastal"", -36.59814469112224], [""Northern Mojave"", -0.372938475665749], [""Sacramento"", -27.318842510093692], [""San Francisco Bay"", -22.122542350308624], [""San Joaquin"", -25.120792542339146], [""Southern Coastal"", -2.841406392694064], [""Southern Mojave"", -0.2532787543916042], [""Tulare-Buena Vista"", -3.797871617812642]]","Precipitation change (2013 minus 2012) by watershed (inches):
+
+- Central Coastal: -11.968148661126502
+- Northern Coastal: -36.59814469112224
+- Northern Mojave: -0.372938475665749
+- Sacramento: -27.318842510093692
+- San Francisco Bay: -22.122542350308624
+- San Joaquin: -25.120792542339146
+- Southern Coastal: -2.841406392694064
+- Southern Mojave: -0.2532787543916042
+- Tulare-Buena Vista: -3.797871617812642","SELECT watershed,
+       MAX(CASE WHEN year=2013 THEN precipitation_in END) - MAX(CASE WHEN year=2012 THEN precipitation_in END) AS precipitation_change_2013_minus_2012
+FROM dashboard_huc4_year
+WHERE year IN (2012,2013)
+GROUP BY watershed
+ORDER BY watershed;","[[""Central Coastal"", -11.968148661126502], [""Northern Coastal"", -36.59814469112224], [""Northern Mojave"", -0.372938475665749], [""Sacramento"", -27.318842510093692], [""San Francisco Bay"", -22.122542350308624], [""San Joaquin"", -25.120792542339146], [""Southern Coastal"", -2.841406392694064], [""Southern Mojave"", -0.2532787543916042], [""Tulare-Buena Vista"", -3.797871617812642]]",true,,,1,gpt-5-mini
+join_01,multi_table_join,"For 2015, return each watershed's dashboard irrigation MGD and its annual-category irrigation MGD side by side, alphabetically.","SELECT d.watershed, d.irrigation_mgd, c.annual_avg_use_mgd FROM dashboard_huc4_year d JOIN water_huc4_annual_category c ON c.huc4 = d.huc4 AND c.year = d.year AND c.category = 'irrigation' WHERE d.year = 2015 ORDER BY d.watershed","[[""Central Coastal"", 603.1400317643743, 601.0350131433959], [""Northern Coastal"", 578.7041341436096, 575.5429032479252], [""Northern Mojave"", 39.26257895982438, 39.221021182325], [""Sacramento"", 4029.126338707867, 4005.476268569087], [""San Francisco Bay"", 96.93824866380274, 96.45396012838334], [""San Joaquin"", 4624.47680110663, 4605.393473860807], [""Southern Coastal"", 96.14176466665847, 96.44959268880791], [""Southern Mojave"", 1196.5304614356874, 1197.3946630480975], [""Tulare-Buena Vista"", 5721.59704145247, 5705.239412662752]]","Here are the watersheds (alphabetical) with 2015 dashboard irrigation MGD and the annual-category (irrigation) MGD:
+
+- Central Coastal — Dashboard: 603.1400317643743; Annual-category (irrigation): 601.0350131433959
+- Northern Coastal — Dashboard: 578.7041341436096; Annual-category (irrigation): 575.5429032479252
+- Northern Mojave — Dashboard: 39.26257895982438; Annual-category (irrigation): 39.221021182325
+- Sacramento — Dashboard: 4029.126338707867; Annual-category (irrigation): 4005.476268569087
+- San Francisco Bay — Dashboard: 96.93824866380274; Annual-category (irrigation): 96.45396012838334
+- San Joaquin — Dashboard: 4624.47680110663; Annual-category (irrigation): 4605.393473860807
+- Southern Coastal — Dashboard: 96.14176466665847; Annual-category (irrigation): 96.44959268880791
+- Southern Mojave — Dashboard: 1196.5304614356874; Annual-category (irrigation): 1197.3946630480975
+- Tulare-Buena Vista — Dashboard: 5721.59704145247; Annual-category (irrigation): 5705.239412662752","SELECT d.watershed, d.irrigation_mgd AS dashboard_irrigation_mgd, w.annual_avg_use_mgd AS annual_category_irrigation_mgd, w.category, d.huc4, d.year
+FROM dashboard_huc4_year d
+JOIN water_huc4_annual_category w
+  ON d.watershed = w.watershed AND d.huc4 = w.huc4 AND d.year = w.year
+WHERE d.year = 2015
+ORDER BY d.watershed ASC;","[[""Central Coastal"", 603.1400317643743, 601.0350131433959, ""irrigation"", ""1806"", 2015], [""Central Coastal"", 603.1400317643743, 152.166691319525, ""public_supply"", ""1806"", 2015], [""Northern Coastal"", 578.7041341436096, 575.5429032479252, ""irrigation"", ""1801"", 2015], [""Northern Coastal"", 578.7041341436096, 60.91066464863332, ""public_supply"", ""1801"", 2015], [""Northern Mojave"", 39.26257895982438, 39.221021182325, ""irrigation"", ""1809"", 2015], [""Northern Mojave"", 39.26257895982438, 126.97510007378332, ""public_supply"", ""1809"", 2015], [""Sacramento"", 4029.126338707867, 4005.476268569087, ""irrigation"", ""1802"", 2015], [""Sacramento"", 4029.126338707867, 421.6103888015834, ""public_supply"", ""1802"", 2015], [""San Francisco Bay"", 96.93824866380274, 96.45396012838334, ""irrigation"", ""1805"", 2015], [""San Francisco Bay"", 96.93824866380274, 662.3699661987499, ""public_supply"", ""1805"", 2015], [""San Joaquin"", 4624.47680110663, 4605.393473860807, ""irrigation"", ""1804"", 2015], [""San Joaquin"", 4624.47680110663, 308.41981588077664, ""public_supply"", ""1804"", 2015], [""Southern Coastal"", 96.14176466665847, 96.44959268880791, ""irrigation"", ""1807"", 2015], [""Southern Coastal"", 96.14176466665847, 1894.5111589123665, ""public_supply"", ""1807"", 2015], [""Southern Mojave"", 1196.5304614356874, 1197.3946630480975, ""irrigation"", ""1810"", 2015], [""Southern Mojave"", 1196.5304614356874, 168.65846471470832, ""public_supply"", ""1810"", 2015], [""Tulare-Buena Vista"", 5721.59704145247, 5705.239412662752, ""irrigation"", ""1803"", 2015], [""Tulare-Buena Vista"", 5721.59704145247, 374.08166482648335, ""public_supply"", ""1803"", 2015]]",false,wrong_filter,,1,gpt-5-mini
+join_02,multi_table_join,"For Sacramento in 2010, return dashboard precipitation and public-supply use together.","SELECT d.precipitation_in, c.annual_avg_use_mgd FROM dashboard_huc4_year d JOIN water_huc4_annual_category c ON c.huc4 = d.huc4 AND c.year = d.year AND c.category = 'public_supply' WHERE d.watershed = 'Sacramento' AND d.year = 2010","[[36.10545977011494, 436.6744349697667]]","Sacramento (HUC4 1802), 2010 — precipitation: 36.10545977011494 in; public_supply annual average use: 436.6744349697667 MGD.","SELECT d.watershed, d.huc4, d.year, d.precipitation_in, w.category, w.annual_avg_use_mgd
+FROM dashboard_huc4_year d
+JOIN water_huc4_annual_category w
+  ON d.huc4 = w.huc4 AND d.year = w.year
+WHERE d.watershed = 'Sacramento' AND d.year = 2010 AND lower(w.category) LIKE '%public%';","[[""Sacramento"", ""1802"", 2010, 36.10545977011494, ""public_supply"", 436.6744349697667]]",false,wrong_filter,,1,gpt-5-mini
+join_03,multi_table_join,"Using the HUC12 table and dashboard table, return each watershed's summed HUC12 irrigation and dashboard irrigation for 2020, alphabetically.","SELECT d.watershed, SUM(h.irrigation_mgd), d.irrigation_mgd FROM dashboard_huc4_year d JOIN irrigation_huc12_annual h ON h.huc4 = d.huc4 AND h.year = d.year WHERE d.year = 2020 GROUP BY d.watershed, d.irrigation_mgd ORDER BY d.watershed","[[""Central Coastal"", 551.2134520590043, 551.2134520590043], [""Northern Coastal"", 570.7310390732453, 570.7310390732453], [""Northern Mojave"", 75.5839333364082, 75.5839333364082], [""Sacramento"", 4349.5045337007305, 4349.5045337007305], [""San Francisco Bay"", 136.8455906788189, 136.8455906788189], [""San Joaquin"", 5059.2474664886, 5059.2474664886], [""Southern Coastal"", 208.6607502728745, 208.6607502728745], [""Southern Mojave"", 1244.188624372097, 1244.188624372097], [""Tulare-Buena Vista"", 5852.802532542977, 5852.802532542977]]","For 2020, summed HUC12 irrigation and dashboard irrigation by watershed (MGD):
+
+- Central Coastal: HUC12 = 551.2134520590043, Dashboard = 551.2134520590043
+- Northern Coastal: HUC12 = 570.7310390732453, Dashboard = 570.7310390732453
+- Northern Mojave: HUC12 = 75.5839333364082, Dashboard = 75.5839333364082
+- Sacramento: HUC12 = 4349.5045337007305, Dashboard = 4349.5045337007305
+- San Francisco Bay: HUC12 = 136.8455906788189, Dashboard = 136.8455906788189
+- San Joaquin: HUC12 = 5059.2474664886, Dashboard = 5059.2474664886
+- Southern Coastal: HUC12 = 208.6607502728745, Dashboard = 208.6607502728745
+- Southern Mojave: HUC12 = 1244.188624372097, Dashboard = 1244.188624372097
+- Tulare-Buena Vista: HUC12 = 5852.802532542977, Dashboard = 5852.802532542977","SELECT w.watershed,
+       COALESCE(h.sum_huc12_irrigation,0) AS huc12_irrigation_mgd,
+       COALESCE(d.sum_dashboard_irrigation,0) AS dashboard_irrigation_mgd
+FROM (
+  SELECT watershed FROM irrigation_huc12_annual WHERE year=2020
+  UNION
+  SELECT watershed FROM dashboard_huc4_year WHERE year=2020
+) w
+LEFT JOIN (
+  SELECT watershed, SUM(irrigation_mgd) AS sum_huc12_irrigation
+  FROM irrigation_huc12_annual
+  WHERE year=2020
+  GROUP BY watershed
+) h ON w.watershed = h.watershed
+LEFT JOIN (
+  SELECT watershed, SUM(irrigation_mgd) AS sum_dashboard_irrigation
+  FROM dashboard_huc4_year
+  WHERE year=2020
+  GROUP BY watershed
+) d ON w.watershed = d.watershed
+ORDER BY w.watershed;","[[""Central Coastal"", 551.2134520590043, 551.2134520590043], [""Northern Coastal"", 570.7310390732453, 570.7310390732453], [""Northern Mojave"", 75.5839333364082, 75.5839333364082], [""Sacramento"", 4349.5045337007305, 4349.5045337007305], [""San Francisco Bay"", 136.8455906788189, 136.8455906788189], [""San Joaquin"", 5059.2474664886, 5059.2474664886], [""Southern Coastal"", 208.6607502728745, 208.6607502728745], [""Southern Mojave"", 1244.188624372097, 1244.188624372097], [""Tulare-Buena Vista"", 5852.802532542977, 5852.802532542977]]",true,,,1,gpt-5-mini
+join_04,multi_table_join,"For each watershed in 2018, return precipitation inches and public-supply use, ordered by public-supply use descending.","SELECT d.watershed, d.precipitation_in, c.annual_avg_use_mgd FROM dashboard_huc4_year d JOIN water_huc4_annual_category c ON c.huc4 = d.huc4 AND c.year = d.year WHERE d.year = 2018 AND c.category = 'public_supply' ORDER BY c.annual_avg_use_mgd DESC","[[""Southern Coastal"", 7.859999999999999, 1952.6940783587586], [""San Francisco Bay"", 21.75621387871388, 785.8319975555418], [""Sacramento"", 27.482692307692307, 462.33168256815003], [""Tulare-Buena Vista"", 9.377790616246498, 400.16450255953345], [""San Joaquin"", 25.780323751568048, 335.0676893126917], [""Southern Mojave"", 4.810471466088624, 177.95185772138836], [""Central Coastal"", 21.39179728317659, 156.64996670551668], [""Northern Mojave"", 3.0475139664804467, 135.20765002256667], [""Northern Coastal"", 35.66485269778219, 63.54526442216667]]","Here are the watersheds for 2018 with precipitation (inches) and public-supply use (mgd), ordered by public-supply use descending:
+
+- Southern Coastal — precipitation_in: 7.859999999999999, public_supply_use_mgd: 1952.6940783587586  
+- San Francisco Bay — precipitation_in: 21.75621387871388, public_supply_use_mgd: 785.8319975555418  
+- Sacramento — precipitation_in: 27.482692307692307, public_supply_use_mgd: 462.33168256815003  
+- Tulare-Buena Vista — precipitation_in: 9.377790616246498, public_supply_use_mgd: 400.16450255953345  
+- San Joaquin — precipitation_in: 25.780323751568048, public_supply_use_mgd: 335.0676893126917  
+- Southern Mojave — precipitation_in: 4.810471466088624, public_supply_use_mgd: 177.95185772138836  
+- Central Coastal — precipitation_in: 21.39179728317659, public_supply_use_mgd: 156.64996670551668  
+- Northern Mojave — precipitation_in: 3.0475139664804467, public_supply_use_mgd: 135.20765002256667  
+- Northern Coastal — precipitation_in: 35.66485269778219, public_supply_use_mgd: 63.54526442216667","SELECT watershed, AVG(precipitation_in) AS precipitation_in, SUM(annual_avg_use_mgd) AS public_supply_use_mgd
+FROM water_huc4_annual_category
+WHERE year = 2018
+  AND category LIKE '%Public%'
+GROUP BY watershed
+ORDER BY public_supply_use_mgd DESC;","[[""Southern Coastal"", 7.859999999999999, 1952.6940783587586], [""San Francisco Bay"", 21.75621387871388, 785.8319975555418], [""Sacramento"", 27.482692307692307, 462.33168256815003], [""Tulare-Buena Vista"", 9.377790616246498, 400.16450255953345], [""San Joaquin"", 25.780323751568048, 335.0676893126917], [""Southern Mojave"", 4.810471466088624, 177.95185772138836], [""Central Coastal"", 21.39179728317659, 156.64996670551668], [""Northern Mojave"", 3.0475139664804467, 135.20765002256667], [""Northern Coastal"", 35.66485269778219, 63.54526442216667]]",true,,,1,gpt-5-mini
+join_05,multi_table_join,"For 2005, return each watershed, its HUC12 count from the dashboard, and the count of HUC12 rows with positive irrigation, alphabetically.","SELECT d.watershed, d.huc12_count, SUM(CASE WHEN h.irrigation_mgd > 0 THEN 1 ELSE 0 END) AS positive_huc12_count FROM dashboard_huc4_year d JOIN irrigation_huc12_annual h ON h.huc4 = d.huc4 AND h.year = d.year WHERE d.year = 2005 GROUP BY d.watershed, d.huc12_count ORDER BY d.watershed","[[""Central Coastal"", 226, 206], [""Northern Coastal"", 218, 170], [""Northern Mojave"", 72, 41], [""Sacramento"", 345, 298], [""San Francisco Bay"", 68, 54], [""San Joaquin"", 197, 189], [""Southern Coastal"", 82, 57], [""Southern Mojave"", 63, 51], [""Tulare-Buena Vista"", 252, 246]]","For 2005:
+- Central Coastal — huc12_count: 226; HUC12 rows with irrigation_mgd > 0: 206
+- Northern Coastal — huc12_count: 218; HUC12 rows with irrigation_mgd > 0: 170
+- Northern Mojave — huc12_count: 72; HUC12 rows with irrigation_mgd > 0: 41
+- Sacramento — huc12_count: 345; HUC12 rows with irrigation_mgd > 0: 298
+- San Francisco Bay — huc12_count: 68; HUC12 rows with irrigation_mgd > 0: 54
+- San Joaquin — huc12_count: 197; HUC12 rows with irrigation_mgd > 0: 189
+- Southern Coastal — huc12_count: 82; HUC12 rows with irrigation_mgd > 0: 57
+- Southern Mojave — huc12_count: 63; HUC12 rows with irrigation_mgd > 0: 51
+- Tulare-Buena Vista — huc12_count: 252; HUC12 rows with irrigation_mgd > 0: 246","SELECT d.watershed, d.huc12_count, COALESCE(i.positive_count, 0) AS positive_huc12_with_irrigation_count
+FROM dashboard_huc4_year d
+LEFT JOIN (
+  SELECT watershed, COUNT(DISTINCT huc12) AS positive_count
+  FROM irrigation_huc12_annual
+  WHERE year = 2005 AND irrigation_mgd > 0
+  GROUP BY watershed
+) i ON d.watershed = i.watershed
+WHERE d.year = 2005
+ORDER BY d.watershed;","[[""Central Coastal"", 226, 206], [""Northern Coastal"", 218, 170], [""Northern Mojave"", 72, 41], [""Sacramento"", 345, 298], [""San Francisco Bay"", 68, 54], [""San Joaquin"", 197, 189], [""Southern Coastal"", 82, 57], [""Southern Mojave"", 63, 51], [""Tulare-Buena Vista"", 252, 246]]",true,,,1,gpt-5-mini
+join_06,multi_table_join,Join the dashboard and category tables to find which watershed had the highest public-supply-use-to-precipitation ratio in 2016.,"SELECT d.watershed, c.annual_avg_use_mgd / d.precipitation_in AS ratio FROM dashboard_huc4_year d JOIN water_huc4_annual_category c ON c.huc4 = d.huc4 AND c.year = d.year AND c.category = 'public_supply' WHERE d.year = 2016 ORDER BY ratio DESC LIMIT 1","[[""Southern Coastal"", 185.4675986214558]]","I ran a query looking for rows where water_huc4_annual_category.category = 'Public supply' joined to dashboard_huc4_year for 2016, and it returned no matching records — so I cannot determine which watershed had the highest public-supply-use-to-precipitation ratio in 2016 from that result.
+
+Possible reasons: the category label may be different (e.g., punctuation/capitalization or a different wording), or precipitation values for 2016 are missing/zero for matching rows.
+
+Would you like me to try again searching for available category values (or try alternative category spellings like 'Public-supply', 'Public Supply', 'public supply') so I can rerun the join and compute the ratio?","SELECT c.watershed, c.huc4, c.annual_avg_use_mgd AS public_supply_mgd, d.precipitation_in, (c.annual_avg_use_mgd / d.precipitation_in) AS ps_to_precip_ratio
+FROM water_huc4_annual_category c
+JOIN dashboard_huc4_year d ON c.huc4 = d.huc4 AND c.year = d.year
+WHERE c.category = 'Public supply' AND c.year = 2016 AND d.precipitation_in IS NOT NULL AND d.precipitation_in <> 0
+ORDER BY ps_to_precip_ratio DESC
+LIMIT 1;",[],false,wrong_filter,,1,gpt-5-mini
+join_07,multi_table_join,"For San Francisco Bay from 2018 through 2020, return year, temperature, irrigation category use, and public-supply category use.","SELECT d.year, d.temperature_f, i.annual_avg_use_mgd, p.annual_avg_use_mgd FROM dashboard_huc4_year d JOIN water_huc4_annual_category i ON i.huc4 = d.huc4 AND i.year = d.year AND i.category = 'irrigation' JOIN water_huc4_annual_category p ON p.huc4 = d.huc4 AND p.year = d.year AND p.category = 'public_supply' WHERE d.watershed = 'San Francisco Bay' AND d.year BETWEEN 2018 AND 2020 ORDER BY d.year","[[2018, 58.44125445651957, 124.04672946959109, 785.8319975555418], [2019, 58.04554545997811, 112.02260521769216, 798.4410180472333], [2020, 59.236942128989035, 136.69647963447343, 890.9700500448749]]","2018 — temperature_f = 58.44125445651957, irrigation annual_avg_use_mgd = 124.04672946959109, public-supply annual_avg_use_mgd = not available
+2019 — temperature_f = 58.04554545997811, irrigation annual_avg_use_mgd = 112.02260521769216, public-supply annual_avg_use_mgd = not available
+2020 — temperature_f = 59.236942128989035, irrigation annual_avg_use_mgd = 136.69647963447343, public-supply annual_avg_use_mgd = not available","SELECT year, MAX(temperature_f) AS temperature_f,
+       MAX(CASE WHEN category='irrigation' THEN annual_avg_use_mgd END) AS irrigation_use_mgd,
+       MAX(CASE WHEN category='public-supply' THEN annual_avg_use_mgd END) AS public_supply_use_mgd
+FROM water_huc4_annual_category
+WHERE watershed='San Francisco Bay' AND year BETWEEN 2018 AND 2020 AND category IN ('irrigation','public-supply')
+GROUP BY year
+ORDER BY year;","[[2018, 58.44125445651957, 124.04672946959109, null], [2019, 58.04554545997811, 112.02260521769216, null], [2020, 59.236942128989035, 136.69647963447343, null]]",false,wrong_table,,1,gpt-5-mini
+join_08,multi_table_join,"For 2012, return each watershed's effective precipitation MGD and average HUC12 irrigation MGD, alphabetically.","SELECT d.watershed, d.effective_precipitation_mgd, AVG(h.irrigation_mgd) FROM dashboard_huc4_year d JOIN irrigation_huc12_annual h ON h.huc4 = d.huc4 AND h.year = d.year WHERE d.year = 2012 GROUP BY d.watershed, d.effective_precipitation_mgd ORDER BY d.watershed","[[""Central Coastal"", 184.5994019821, 2.4781114717955197], [""Northern Coastal"", 277.23469062692, 2.502233106261548], [""Northern Mojave"", 10.127691945, 0.5633909243042519], [""Sacramento"", 946.264759110109, 10.958338847954604], [""San Francisco Bay"", 54.87710852739, 1.2672258601437698], [""San Joaquin"", 645.24491421288, 22.89797510950245], [""Southern Coastal"", 18.440470846232, 1.1729568194569733], [""Southern Mojave"", 62.10462168757, 24.628491448719355], [""Tulare-Buena Vista"", 645.4105666142163, 24.555530224837856]]","- Central Coastal — effective_precipitation_mgd: 184.5994019821; average_HUC12_irrigation_mgd: 2.4781114717955197
+- Northern Coastal — effective_precipitation_mgd: 277.23469062692; average_HUC12_irrigation_mgd: 2.502233106261548
+- Northern Mojave — effective_precipitation_mgd: 10.127691945; average_HUC12_irrigation_mgd: 0.5633909243042519
+- Sacramento — effective_precipitation_mgd: 946.264759110109; average_HUC12_irrigation_mgd: 10.958338847954604
+- San Francisco Bay — effective_precipitation_mgd: 54.87710852739; average_HUC12_irrigation_mgd: 1.2672258601437698
+- San Joaquin — effective_precipitation_mgd: 645.24491421288; average_HUC12_irrigation_mgd: 22.89797510950245
+- Southern Coastal — effective_precipitation_mgd: 18.440470846232; average_HUC12_irrigation_mgd: 1.1729568194569733
+- Southern Mojave — effective_precipitation_mgd: 62.10462168757; average_HUC12_irrigation_mgd: 24.628491448719355
+- Tulare-Buena Vista — effective_precipitation_mgd: 645.4105666142163; average_HUC12_irrigation_mgd: 24.555530224837856","SELECT d.watershed, d.effective_precipitation_mgd, AVG(h.irrigation_mgd) AS avg_huc12_irrigation_mgd
+FROM dashboard_huc4_year d
+LEFT JOIN irrigation_huc12_annual h
+  ON d.watershed = h.watershed AND d.year = h.year
+WHERE d.year = 2012
+GROUP BY d.watershed, d.effective_precipitation_mgd
+ORDER BY d.watershed ASC;","[[""Central Coastal"", 184.5994019821, 2.4781114717955197], [""Northern Coastal"", 277.23469062692, 2.502233106261548], [""Northern Mojave"", 10.127691945, 0.5633909243042519], [""Sacramento"", 946.264759110109, 10.958338847954604], [""San Francisco Bay"", 54.87710852739, 1.2672258601437698], [""San Joaquin"", 645.24491421288, 22.89797510950245], [""Southern Coastal"", 18.440470846232, 1.1729568194569733], [""Southern Mojave"", 62.10462168757, 24.628491448719355], [""Tulare-Buena Vista"", 645.4105666142163, 24.555530224837856]]",true,,,1,gpt-5-mini
+join_09,multi_table_join,Which watershed had the greatest absolute gap between dashboard irrigation MGD and category-table irrigation MGD in 2019?,"SELECT d.watershed, ABS(d.irrigation_mgd - c.annual_avg_use_mgd) AS absolute_gap_mgd FROM dashboard_huc4_year d JOIN water_huc4_annual_category c ON c.huc4 = d.huc4 AND c.year = d.year AND c.category = 'irrigation' WHERE d.year = 2019 ORDER BY absolute_gap_mgd DESC LIMIT 1","[[""Tulare-Buena Vista"", 25.530364734182513]]","Tulare-Buena Vista — dashboard irrigation = 5458.572744734394 MGD, category (annual_avg_use) = 396.20049831505 MGD, absolute gap = 5062.372246419344 MGD.","SELECT dh.watershed, dh.irrigation_mgd AS dashboard_mgd, wc.annual_avg_use_mgd AS category_mgd, ABS(dh.irrigation_mgd - wc.annual_avg_use_mgd) AS abs_gap
+FROM dashboard_huc4_year dh
+JOIN water_huc4_annual_category wc
+  ON dh.watershed = wc.watershed AND dh.year = wc.year
+WHERE dh.year = 2019
+ORDER BY abs_gap DESC
+LIMIT 1;","[[""Tulare-Buena Vista"", 5458.572744734394, 396.20049831505, 5062.372246419344]]",false,wrong_filter,,1,gpt-5-mini
+join_10,multi_table_join,"Across all years, which watershed has the highest average public-supply use, and what is its average dashboard precipitation?","SELECT d.watershed, AVG(c.annual_avg_use_mgd) AS avg_public_supply_mgd, AVG(d.precipitation_in) AS avg_precipitation_in FROM dashboard_huc4_year d JOIN water_huc4_annual_category c ON c.huc4 = d.huc4 AND c.year = d.year AND c.category = 'public_supply' GROUP BY d.watershed ORDER BY avg_public_supply_mgd DESC LIMIT 1","[[""Southern Coastal"", 1895.1199944803316, 10.06804700721735]]","I couldn’t determine that from the database as queried: the query returned no matching rows (no watershed had both public-supply records in water_huc4_annual_category and precipitation records in dashboard_huc4_year for averaging). 
+
+Would you like me to instead:
+- return the watershed with the highest average public-supply use alone (using water_huc4_annual_category), or
+- return average precipitation by watershed from the water_huc4_annual_category table and pair that with public-supply averages?","SELECT p.watershed, p.avg_use_mgd, d.avg_precip_in
+FROM (
+  SELECT watershed, AVG(annual_avg_use_mgd) AS avg_use_mgd
+  FROM water_huc4_annual_category
+  WHERE category = 'public-supply'
+  GROUP BY watershed
+) p
+JOIN (
+  SELECT watershed, AVG(precipitation_in) AS avg_precip_in
+  FROM dashboard_huc4_year
+  GROUP BY watershed
+) d ON p.watershed = d.watershed
+ORDER BY p.avg_use_mgd DESC
+LIMIT 1;",[],false,wrong_filter,,1,gpt-5-mini

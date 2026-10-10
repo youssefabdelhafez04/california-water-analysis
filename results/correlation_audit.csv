@@ -1,0 +1,4 @@
+analysis,water_file,water_series,rain_files,rain_series,months,pearson_correlation
+original_reported_minus_0_52,PS_HUC12_Tot_2000_2020.csv,public supply total MGD summed from HUC12 to HUC4 1804,Mercer.csv;Sanora.csv;West_Point.csv,"mean daily PRCP (Inches) across 3 stations, legacy month shift",252,-0.5177396926262033
+like_for_like_correct_irrigation,Irr_CU_HUC12_Tot_monthly_2000_2020.csv,irrigation consumptive use MGD summed from HUC12 to HUC4 1804,Mercer.csv;Sanora.csv;West_Point.csv,"mean daily PRCP (Inches) across 3 stations, legacy month shift",252,-0.45976413305778846
+calendar_aligned_correct_irrigation,Irr_CU_HUC12_Tot_monthly_2000_2020.csv,irrigation consumptive use MGD summed from HUC12 to HUC4 1804,Mercer.csv;Sanora.csv;West_Point.csv,"mean daily PRCP (Inches) across 3 stations, calendar-month sum",252,-0.6720699747556189

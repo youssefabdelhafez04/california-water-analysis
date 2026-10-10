@@ -1,0 +1,30 @@
+.DS_Store
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.streamlit/secrets.toml
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Raw data are local inputs and are too large for ordinary Git hosting.
+/*.csv
+/*.html
+/b7974dff79ff41f0bd3cd4d8f248c6f4.json
+Irr_CU_HUC12_Tot_monthly_2000_2020.csv
+PS_HUC12_Tot_2000_2020.csv
+Irrigation_wateruse.csv
+PublicSupply_wateruse.csv
+PPTeff_HUC12_Tot_annual_2000_2020.csv
+*.sqlite
+!results/water_analysis.sqlite
+
+# Reproducible large analytical extract; dashboard extracts stay trackable.
+results/irrigation_huc12_panel.csv
+results/irrigation_validation_predictions.csv

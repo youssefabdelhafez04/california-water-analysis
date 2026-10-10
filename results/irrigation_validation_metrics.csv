@@ -1,0 +1,3 @@
+model,train_window,test_window,rmse_mgd,mae_mgd,log_rmse,test_observations,huc12_units,smearing_factor
+precip_temperature_lag_ridge,2001-2013 (2000 supplies first lag),2014-2020,5.045791606853945,2.077524295387156,0.3298007746643182,8183,1169,1.0575407276812616
+naive_last_year,2001-2013 (2000 supplies first lag),2014-2020,3.8991788296608574,1.7579552421656859,0.5345601085048689,8183,1169,

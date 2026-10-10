@@ -1,0 +1,5 @@
+config,id,type,question,expected_sql,expected_result,agent_answer,agent_sql,agent_result,correct,failure_type,error,attempts,model,input_tokens,cached_input_tokens,cache_write_tokens,output_tokens,api_requests,cost_usd
+schema_plus_examples,agg_02,aggregation,What was the total irrigation MGD across all nine watersheds in 2015?,SELECT SUM(irrigation_mgd) FROM dashboard_huc4_year WHERE year = 2015,[[16985.917400900922]],The total irrigation across all nine watersheds in 2015 was 16985.917400900922 MGD.,SELECT SUM(irrigation_mgd) AS total_irrigation_mgd FROM dashboard_huc4_year WHERE year = 2015,[[16985.917400900922]],true,,,1,gpt-5-mini,5347,3840,0,383,2,0.0012387500
+schema_plus_examples,agg_05,aggregation,How many distinct HUC12 units ever have positive irrigation use?,SELECT COUNT(DISTINCT huc12) FROM irrigation_huc12_annual WHERE irrigation_mgd > 0,[[1637]],1637 distinct HUC12 units have had positive irrigation use.,"SELECT COUNT(DISTINCT huc12) AS distinct_huc12_with_positive_irrigation
+FROM irrigation_huc12_annual
+WHERE irrigation_mgd > 0;",[[1637]],true,,,1,gpt-5-mini,5265,3840,0,298,2,0.0010482500

@@ -1,0 +1,2 @@
+specification,policy_year,effect_mgd,clustered_se_mgd,ci_95_low_mgd,ci_95_high_mgd,p_value,watershed_clusters,observations
+placebo_2015_using_2000_2017_only,2015,-51.77583233626763,26.066114074524315,-102.8644771392479,-0.6871875332873643,0.04699700026765167,9,324

@@ -1,0 +1,19 @@
+{
+  "command": "python -m water_policy.build_data_product",
+  "database": "/Users/youssefabdelhafez/Downloads/Climate 323/Clasp Project/results/water_analysis.sqlite",
+  "database_table_rows": {
+    "irrigation_huc12_annual": 91035,
+    "water_huc4_annual_category": 378,
+    "dashboard_huc4_year": 189,
+    "correlation_audit": 3,
+    "irrigation_elasticity_results": 2,
+    "irrigation_drought_results": 1,
+    "irrigation_robustness_results": 8,
+    "irrigation_validation_metrics": 2,
+    "policy_before_after_results": 9,
+    "policy_did_results": 1
+  },
+  "dashboard_rows": 189,
+  "dashboard_geojson_features": 9,
+  "correlation_rows": 3
+}

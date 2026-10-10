@@ -1,0 +1,2 @@
+specification,policy_year,effect_mgd,clustered_se_mgd,ci_95_low_mgd,ci_95_high_mgd,p_value,watershed_clusters,observations
+category_DiD_unit_and_year_FE,2018,-124.96851119514804,63.27962856730141,-248.99430414213074,-0.9427182481653347,0.048283851378787435,9,378

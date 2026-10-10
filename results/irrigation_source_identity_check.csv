@@ -1,0 +1,2 @@
+identity_test,matched_unit_years,mean_identity_error_mgd,max_absolute_identity_error_mgd,max_absolute_relative_error,conclusion
+Irrigation_wateruse - PPTeff = day-weighted monthly irrigation CU,32924,8.8583315689755e-09,6.191803279875785e-05,0.000342499209373376,"Irrigation_wateruse.csv is total crop ET, not irrigation consumptive use"
